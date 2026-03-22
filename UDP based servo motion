@@ -1,0 +1,80 @@
+//Receiver code -> servo motor code
+//Specifically made for 3 servos
+//Can be controlled using mobile based on packet received
+//Acts as per provided IP
+
+#include <WiFiS3.h>
+#include <WiFiUdp.h>
+#include <Servo.h>
+
+const char ssid[] = "ServoNet";
+const char pass[] = "12345678";
+WiFiUDP udp;
+unsigned int localPort = 4210;
+
+Servo servoA, servoB, servoC;
+
+void setup() {
+  Serial.begin(115200);
+  
+  // FIXED LINE FOR UNO R4 WIFI:
+  int status = WiFi.beginAP(ssid, pass);
+  
+  if (status != WL_AP_LISTENING) {
+    Serial.println("Creating access point failed");
+    while (true);
+  }
+
+  Serial.print("Access Point Started. SSID: ");
+  Serial.println(ssid);
+  
+  // On R4 WiFi, the AP IP is typically 192.168.4.1
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP()); 
+
+  udp.begin(localPort);
+
+  servoA.attach(3);
+  servoB.attach(5);
+  servoC.attach(6);
+}
+
+void loop() {
+  int packetSize = udp.parsePacket();
+  if (packetSize) {
+    char cmd = udp.read();
+    Serial.print("Received: ");
+    Serial.println(cmd);
+    switch (cmd) {
+    case 'A':
+      servoA.write(45);
+      break;
+    case 'B':
+      servoA.write(90);
+      break;
+    case 'C':
+      servoA.write(135);
+      break;
+    
+    case 'D':
+      servoB.write(45);
+      break;
+    case 'E':
+      servoB.write(90);
+      break;
+    case 'F':
+      servoB.write(135);
+      break;
+    
+    case 'G':
+      servoC.write(45);
+      break;
+    case 'H':
+      servoC.write(90);
+      break;
+    case 'I':
+      servoC.write(135);
+      break;  
+  }
+}
+}
